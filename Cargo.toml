@@ -4,7 +4,13 @@ version = "0.1.0"
 authors = ["Damian Jaworek <damianjaworek@outlook.com>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "esprimo"
+path = "src/lib.rs"
+
+[[bin]]
+name = "esprimoc"
+path = "src/main.rs"
 
 [build-dependencies]
 lalrpop = "0.19"
