@@ -14,11 +14,14 @@ fn main() -> std::io::Result<()> {
     let cli_options = CliOptions::from_args();
     println!("{:#?}", cli_options);
 
-    let output = esprimo::emitter::emit();
-
     use std::fs::File;
-    use std::io::prelude::*;
-    let mut file = File::create(cli_options.output)?;
-    file.write_all(&output)?;
+
+    let input_file = File::open(cli_options.input)?;
+    let mut reader = std::io::BufReader::new(input_file);
+
+    let output_file = File::create(cli_options.output)?;
+    let mut writer = std::io::BufWriter::new(output_file);
+
+    esprimo::compile(&mut reader, &mut writer)?;
     Ok(())
 }

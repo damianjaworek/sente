@@ -12,8 +12,9 @@ path = "src/lib.rs"
 name = "esprimoc"
 path = "src/main.rs"
 
-[build-dependencies]
-lalrpop = "0.19"
+[build-dependencies.lalrpop]
+version = "0.19"
+features = ["lexer"]
 
 [dependencies]
 lalrpop-util = "0.19"
