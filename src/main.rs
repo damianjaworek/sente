@@ -2,7 +2,7 @@ use std::path::PathBuf;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
-#[structopt(name = "esprimoc")]
+#[structopt(name = "sentec")]
 struct CliOptions {
     #[structopt(short, long, parse(from_os_str))]
     input: PathBuf,
@@ -21,6 +21,6 @@ fn main() -> std::io::Result<()> {
     let output_file = File::create(cli_options.output)?;
     let mut writer = std::io::BufWriter::new(output_file);
 
-    esprimo::compile(&mut reader, &mut writer)?;
+    sente::compile(&mut reader, &mut writer)?;
     Ok(())
 }

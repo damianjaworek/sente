@@ -219,17 +219,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "esprimo"
-version = "0.1.0"
-dependencies = [
- "lalrpop",
- "lalrpop-util",
- "leb128",
- "regex",
- "structopt",
-]
-
-[[package]]
 name = "fake-simd"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -495,6 +484,17 @@ dependencies = [
  "blake2b_simd",
  "constant_time_eq",
  "crossbeam-utils",
+]
+
+[[package]]
+name = "sente"
+version = "0.1.0"
+dependencies = [
+ "lalrpop",
+ "lalrpop-util",
+ "leb128",
+ "regex",
+ "structopt",
 ]
 
 [[package]]

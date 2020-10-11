@@ -1,10 +1,15 @@
 [package]
 authors = ["Damian Jaworek <damianjaworek@outlook.com>"]
 edition = "2018"
-name = "esprimo"
+name = "sente"
 version = "0.1.0"
+
+[lib]
+name = "sente"
+path = "src/lib.rs"
+
 [[bin]]
-name = "esprimoc"
+name = "sentec"
 path = "src/main.rs"
 
 [build-dependencies]
@@ -17,7 +22,3 @@ lalrpop-util = "0.19"
 leb128 = "0.2"
 regex = "1"
 structopt = "0.3"
-
-[lib]
-name = "esprimo"
-path = "src/lib.rs"
