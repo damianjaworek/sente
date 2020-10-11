@@ -1,3 +1,7 @@
+pub struct Stmts {
+    pub stmts: Vec<Box<Expr>>,
+}
+
 pub enum Expr {
     Number(i32),
     Op(Box<Expr>, Opcode, Box<Expr>),
@@ -8,6 +12,12 @@ pub enum Opcode {
     Div,
     Add,
     Sub,
+}
+
+impl Stmts {
+    pub fn new(stmts: Vec<Box<Expr>>) -> Stmts {
+        Stmts { stmts }
+    }
 }
 
 impl std::fmt::Debug for Expr {

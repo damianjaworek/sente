@@ -1,9 +1,11 @@
 use std::str::FromStr;
-use crate::ast::{Expr, Opcode};
+use crate::ast::{Expr, Opcode, Stmts};
 
 grammar;
 
-pub Expr: Box<Expr> = {
+pub Stmts: Stmts = (<Expr> ";")* => Stmts::new(<>);
+
+Expr: Box<Expr> = {
     Expr ExprOp Factor => Box::new(Expr::Op(<>)),
     Factor,
 };

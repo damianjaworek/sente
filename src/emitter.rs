@@ -119,18 +119,14 @@ fn _emit_element_section() -> Vec<u8> {
     section
 }
 
-fn emit_code_section(expr: &crate::ast::Expr) -> Vec<u8> {
+fn emit_code_section(stmts: &crate::ast::Stmts) -> Vec<u8> {
     const SECTION_ID: u8 = 0x0a;
     let mut section = Vec::new();
     section.push(SECTION_ID);
 
     let mut start_function = Vec::new();
     start_function.extend_from_slice(&wasm::encode_vector(&[]));
-    start_function.extend_from_slice(&compile_expr(expr));
-
-    // Needed because compile_expr does not drop unused values
-    start_function.push(wasm::Opcodes::Drop.into());
-
+    start_function.extend_from_slice(&compile_stmts(stmts));
     start_function.push(wasm::Opcodes::End.into());
 
     let start_function_code = wasm::encode_vector(&start_function);
@@ -179,7 +175,18 @@ fn compile_expr(expr: &crate::ast::Expr) -> Vec<u8> {
     output
 }
 
-pub fn emit(ast: &crate::ast::Expr) -> Vec<u8> {
+fn compile_stmts(stmts: &crate::ast::Stmts) -> Vec<u8> {
+    let mut output = Vec::new();
+
+    for expr in &stmts.stmts {
+        output.extend_from_slice(&compile_expr(&expr));
+        output.push(wasm::Opcodes::Drop.into());
+    }
+
+    output
+}
+
+pub fn emit(ast: &crate::ast::Stmts) -> Vec<u8> {
     let mut output = Vec::new();
     output.extend_from_slice(&MAGIC_MODULE_HEADER);
     output.extend_from_slice(&MODULE_VERSION);
