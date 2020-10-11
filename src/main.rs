@@ -12,7 +12,6 @@ struct CliOptions {
 
 fn main() -> std::io::Result<()> {
     let cli_options = CliOptions::from_args();
-    println!("{:#?}", cli_options);
 
     use std::fs::File;
 

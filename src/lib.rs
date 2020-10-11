@@ -4,6 +4,7 @@ extern crate lalrpop_util;
 lalrpop_mod!(grammar);
 mod ast;
 mod emitter;
+pub mod wasm;
 
 use std::io::{BufReader, BufWriter, Read, Write};
 pub fn compile<R, W>(
@@ -17,11 +18,8 @@ where
     let mut input = String::new();
     reader.read_to_string(&mut input)?;
 
-    let parsed_result = grammar::ExprParser::new().parse(&input);
-
-    println!("{:?}", parsed_result);
-
-    let emitted_code = emitter::emit();
+    let parsed_result = grammar::ExprParser::new().parse(&input).unwrap();
+    let emitted_code = emitter::emit(&parsed_result);
     writer.write_all(&emitted_code)?;
 
     Ok(())
