@@ -127,7 +127,7 @@ fn emit_code_section(stmts: &crate::ast::Stmts) -> Vec<u8> {
     let mut start_function = Vec::new();
     start_function.extend_from_slice(&wasm::encode_vector(&[]));
     start_function.extend_from_slice(&compile_stmts(stmts));
-    start_function.push(wasm::Opcodes::End.into());
+    start_function.push(wasm::opcodes::Opcode::End.into());
 
     let start_function_code = wasm::encode_vector(&start_function);
     let code_vector = wasm::encode_nested_vector(&mut [start_function_code.into_iter()]);
@@ -154,7 +154,7 @@ fn compile_expr(expr: &crate::ast::Expr) -> Vec<u8> {
 
     match expr {
         crate::ast::Expr::Number(number) => {
-            output.push(wasm::Opcodes::I32Const.into());
+            output.push(wasm::opcodes::Opcode::I32Const.into());
             leb128::write::signed(&mut output, *number as i64).unwrap();
         }
         crate::ast::Expr::Op(left, op, right) => {
@@ -162,10 +162,10 @@ fn compile_expr(expr: &crate::ast::Expr) -> Vec<u8> {
             output.extend_from_slice(&compile_expr(right));
 
             let opcode = match op {
-                crate::ast::Opcode::Add => wasm::Opcodes::I32Add,
-                crate::ast::Opcode::Sub => wasm::Opcodes::I32Sub,
-                crate::ast::Opcode::Mul => wasm::Opcodes::I32Mul,
-                crate::ast::Opcode::Div => wasm::Opcodes::I32DivS,
+                crate::ast::Opcode::Add => wasm::opcodes::Opcode::I32Add,
+                crate::ast::Opcode::Sub => wasm::opcodes::Opcode::I32Sub,
+                crate::ast::Opcode::Mul => wasm::opcodes::Opcode::I32Mul,
+                crate::ast::Opcode::Div => wasm::opcodes::Opcode::I32DivS,
             };
 
             output.push(opcode.into());
@@ -180,7 +180,7 @@ fn compile_stmts(stmts: &crate::ast::Stmts) -> Vec<u8> {
 
     for expr in &stmts.stmts {
         output.extend_from_slice(&compile_expr(&expr));
-        output.push(wasm::Opcodes::Drop.into());
+        output.push(wasm::opcodes::Opcode::Drop.into());
     }
 
     output
