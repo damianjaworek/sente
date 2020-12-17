@@ -299,7 +299,8 @@ impl super::Encode for CodeEntry {
         result.extend_from_slice(&self.expression.encode());
 
         let mut output = Vec::new();
-        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        leb128::write::unsigned(&mut output, result.len() as u64)
+            .expect("Failed to write LEB128 number");
         output.extend_from_slice(&result);
         output
     }
@@ -349,7 +350,8 @@ impl super::Encode for Name {
         let result = self.name.clone().into_bytes();
 
         let mut output = Vec::new();
-        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        leb128::write::unsigned(&mut output, result.len() as u64)
+            .expect("Failed to write LEB128 number");
         output.extend_from_slice(&result);
         output
     }
@@ -470,7 +472,8 @@ impl Encode for Type {
 
         let mut output = Vec::new();
         output.push(Type::ID);
-        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        leb128::write::unsigned(&mut output, result.len() as u64)
+            .expect("Failed to write LEB128 number");
         output.extend_from_slice(&result);
         output
     }
@@ -485,7 +488,8 @@ impl Encode for Import {
 
         let mut output = Vec::new();
         output.push(Import::ID);
-        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        leb128::write::unsigned(&mut output, result.len() as u64)
+            .expect("Failed to write LEB128 number");
         output.extend_from_slice(&result);
         output
     }
@@ -500,7 +504,8 @@ impl Encode for Function {
 
         let mut output = Vec::new();
         output.push(Function::ID);
-        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        leb128::write::unsigned(&mut output, result.len() as u64)
+            .expect("Failed to write LEB128 number");
         output.extend_from_slice(&result);
         output
     }
@@ -515,7 +520,8 @@ impl Encode for Table {
 
         let mut output = Vec::new();
         output.push(Table::ID);
-        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        leb128::write::unsigned(&mut output, result.len() as u64)
+            .expect("Failed to write LEB128 number");
         output.extend_from_slice(&result);
         output
     }
@@ -530,7 +536,8 @@ impl Encode for Memory {
 
         let mut output = Vec::new();
         output.push(Memory::ID);
-        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        leb128::write::unsigned(&mut output, result.len() as u64)
+            .expect("Failed to write LEB128 number");
         output.extend_from_slice(&result);
         output
     }
@@ -545,7 +552,8 @@ impl Encode for Global {
 
         let mut output = Vec::new();
         output.push(Global::ID);
-        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        leb128::write::unsigned(&mut output, result.len() as u64)
+            .expect("Failed to write LEB128 number");
         output.extend_from_slice(&result);
         output
     }
@@ -560,7 +568,8 @@ impl Encode for Export {
 
         let mut output = Vec::new();
         output.push(Export::ID);
-        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        leb128::write::unsigned(&mut output, result.len() as u64)
+            .expect("Failed to write LEB128 number");
         output.extend_from_slice(&result);
         output
     }
@@ -575,7 +584,8 @@ impl Encode for Start {
 
         let mut output = Vec::new();
         output.push(Start::ID);
-        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        leb128::write::unsigned(&mut output, result.len() as u64)
+            .expect("Failed to write LEB128 number");
         output.extend_from_slice(&result);
         output
     }
@@ -590,7 +600,8 @@ impl Encode for Element {
 
         let mut output = Vec::new();
         output.push(Element::ID);
-        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        leb128::write::unsigned(&mut output, result.len() as u64)
+            .expect("Failed to write LEB128 number");
         output.extend_from_slice(&result);
         output
     }
@@ -605,7 +616,8 @@ impl Encode for Code {
 
         let mut output = Vec::new();
         output.push(Code::ID);
-        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        leb128::write::unsigned(&mut output, result.len() as u64)
+            .expect("Failed to write LEB128 number");
         output.extend_from_slice(&result);
         output
     }
@@ -620,7 +632,8 @@ impl Encode for Data {
 
         let mut output = Vec::new();
         output.push(Data::ID);
-        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        leb128::write::unsigned(&mut output, result.len() as u64)
+            .expect("Failed to write LEB128 number");
         output.extend_from_slice(&result);
         output
     }

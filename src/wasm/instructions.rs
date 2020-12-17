@@ -1281,8 +1281,10 @@ impl Encode for MemoryArgument {
     fn encode(&self) -> Vec<u8> {
         dbg!(self);
         let mut result = Vec::new();
-        leb128::write::unsigned(&mut result, self.align as u64).unwrap();
-        leb128::write::unsigned(&mut result, self.offset as u64).unwrap();
+        leb128::write::unsigned(&mut result, self.align as u64)
+            .expect("Failed to write LEB128 number");
+        leb128::write::unsigned(&mut result, self.offset as u64)
+            .expect("Failed to write LEB128 number");
         result
     }
 }

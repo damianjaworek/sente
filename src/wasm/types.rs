@@ -141,12 +141,15 @@ impl Encode for Limits {
         match self {
             Limits::Min { min } => {
                 result.push(0x00);
-                leb128::write::unsigned(&mut result, *min as u64).unwrap();
+                leb128::write::unsigned(&mut result, *min as u64)
+                    .expect("Failed to write LEB128 number");
             }
             Limits::MinMax { min, max } => {
                 result.push(0x01);
-                leb128::write::unsigned(&mut result, *min as u64).unwrap();
-                leb128::write::unsigned(&mut result, *max as u64).unwrap();
+                leb128::write::unsigned(&mut result, *min as u64)
+                    .expect("Failed to write LEB128 number");
+                leb128::write::unsigned(&mut result, *max as u64)
+                    .expect("Failed to write LEB128 number");
             }
         }
 

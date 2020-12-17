@@ -39,7 +39,8 @@ impl Encode for TypeId {
     fn encode(&self) -> Vec<u8> {
         dbg!(self);
         let mut result = Vec::new();
-        leb128::write::unsigned(&mut result, self.index as u64).unwrap();
+        leb128::write::unsigned(&mut result, self.index as u64)
+            .expect("Failed to write LEB128 number");
         result
     }
 }
@@ -48,7 +49,8 @@ impl Encode for FunctionId {
     fn encode(&self) -> Vec<u8> {
         dbg!(self);
         let mut result = Vec::new();
-        leb128::write::unsigned(&mut result, self.index as u64).unwrap();
+        leb128::write::unsigned(&mut result, self.index as u64)
+            .expect("Failed to write LEB128 number");
         result
     }
 }
@@ -57,7 +59,8 @@ impl Encode for TableId {
     fn encode(&self) -> Vec<u8> {
         dbg!(self);
         let mut result = Vec::new();
-        leb128::write::unsigned(&mut result, self.index as u64).unwrap();
+        leb128::write::unsigned(&mut result, self.index as u64)
+            .expect("Failed to write LEB128 number");
         result
     }
 }
@@ -66,7 +69,8 @@ impl Encode for MemoryId {
     fn encode(&self) -> Vec<u8> {
         dbg!(self);
         let mut result = Vec::new();
-        leb128::write::unsigned(&mut result, self.index as u64).unwrap();
+        leb128::write::unsigned(&mut result, self.index as u64)
+            .expect("Failed to write LEB128 number");
         result
     }
 }
@@ -75,7 +79,8 @@ impl Encode for GlobalId {
     fn encode(&self) -> Vec<u8> {
         dbg!(self);
         let mut result = Vec::new();
-        leb128::write::unsigned(&mut result, self.index as u64).unwrap();
+        leb128::write::unsigned(&mut result, self.index as u64)
+            .expect("Failed to write LEB128 number");
         result
     }
 }
@@ -84,7 +89,8 @@ impl Encode for LocalId {
     fn encode(&self) -> Vec<u8> {
         dbg!(self);
         let mut result = Vec::new();
-        leb128::write::unsigned(&mut result, self.index as u64).unwrap();
+        leb128::write::unsigned(&mut result, self.index as u64)
+            .expect("Failed to write LEB128 number");
         result
     }
 }
@@ -93,7 +99,8 @@ impl Encode for LabelId {
     fn encode(&self) -> Vec<u8> {
         dbg!(self);
         let mut result = Vec::new();
-        leb128::write::unsigned(&mut result, self.index as u64).unwrap();
+        leb128::write::unsigned(&mut result, self.index as u64)
+            .expect("Failed to write LEB128 number");
         result
     }
 }
@@ -113,7 +120,8 @@ impl Default for MemoryId {
 impl TypeId {
     pub fn encode_as_signed_u33(&self) -> Vec<u8> {
         let mut result = Vec::new();
-        leb128::write::signed(&mut result, self.index as i64).unwrap();
+        leb128::write::signed(&mut result, self.index as i64)
+            .expect("Failed to write LEB128 number");
         result
     }
 
