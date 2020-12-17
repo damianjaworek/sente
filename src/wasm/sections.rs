@@ -8,7 +8,9 @@ pub struct Type {
 }
 
 #[derive(Debug)]
-pub struct Import {}
+pub struct Import {
+    imports: Vec<ImportEntry>,
+}
 
 #[derive(Debug)]
 pub struct Function {
@@ -16,16 +18,24 @@ pub struct Function {
 }
 
 #[derive(Debug)]
-pub struct Table {}
+pub struct Table {
+    tables: Vec<types::TableType>,
+}
 
 #[derive(Debug)]
-pub struct Memory {}
+pub struct Memory {
+    memories: Vec<types::MemoryType>,
+}
 
 #[derive(Debug)]
-pub struct Global {}
+pub struct Global {
+    globals: Vec<GlobalEntry>,
+}
 
 #[derive(Debug)]
-pub struct Export {}
+pub struct Export {
+    exports: Vec<ExportEntry>,
+}
 
 #[derive(Debug)]
 pub struct Start {
@@ -33,11 +43,18 @@ pub struct Start {
 }
 
 #[derive(Debug)]
-pub struct Element {}
+pub struct Element {
+    elements: Vec<ElementEntry>,
+}
 
 #[derive(Debug)]
 pub struct Code {
     codes: Vec<CodeEntry>,
+}
+
+#[derive(Debug)]
+pub struct Data {
+    data: Vec<DataEntry>,
 }
 
 #[derive(Debug)]
@@ -59,7 +76,58 @@ pub struct Expression {
 }
 
 #[derive(Debug)]
-pub struct Data {}
+pub struct ImportEntry {
+    module: Name,
+    name: Name,
+    import_description: ImportDescription,
+}
+
+#[derive(Debug)]
+pub struct Name {
+    name: String,
+}
+
+#[derive(Debug)]
+pub enum ImportDescription {
+    Function(super::indices::TypeId),
+    Table(super::types::TableType),
+    Memory(super::types::MemoryType),
+    Global(super::types::GlobalType),
+}
+
+#[derive(Debug)]
+pub struct GlobalEntry {
+    global_type: types::GlobalType,
+    expression: Expression,
+}
+
+#[derive(Debug)]
+pub struct ExportEntry {
+    name: Name,
+    export_description: ExportDescription,
+}
+
+#[derive(Debug)]
+pub enum ExportDescription {
+    Function(super::indices::FunctionId),
+    Table(super::indices::TableId),
+    Memory(super::indices::MemoryId),
+    Global(super::indices::GlobalId),
+}
+
+#[derive(Debug)]
+pub struct ElementEntry {
+    table_id: indices::TableId,
+    offset: Expression,
+    initialization: Vec<indices::FunctionId>,
+}
+
+#[derive(Debug)]
+pub struct DataEntry {
+    memory_id: indices::MemoryId,
+    offset: Expression,
+    initialization: Vec<u8>,
+}
 
 impl Type {
     const ID: u8 = 0x01;
@@ -71,6 +139,10 @@ impl Type {
 
 impl Import {
     const ID: u8 = 0x02;
+
+    pub fn new(imports: Vec<ImportEntry>) -> Import {
+        Import { imports }
+    }
 }
 
 impl Function {
@@ -83,18 +155,34 @@ impl Function {
 
 impl Table {
     const ID: u8 = 0x04;
+
+    pub fn new(tables: Vec<types::TableType>) -> Table {
+        Table { tables }
+    }
 }
 
 impl Memory {
     const ID: u8 = 0x05;
+
+    pub fn new(memories: Vec<types::MemoryType>) -> Memory {
+        Memory { memories }
+    }
 }
 
 impl Global {
     const ID: u8 = 0x06;
+
+    pub fn new(globals: Vec<GlobalEntry>) -> Global {
+        Global { globals }
+    }
 }
 
 impl Export {
     const ID: u8 = 0x07;
+
+    pub fn new(exports: Vec<ExportEntry>) -> Export {
+        Export { exports }
+    }
 }
 
 impl Start {
@@ -107,6 +195,10 @@ impl Start {
 
 impl Element {
     const ID: u8 = 0x09;
+
+    pub fn new(elements: Vec<ElementEntry>) -> Element {
+        Element { elements }
+    }
 }
 
 impl Code {
@@ -119,6 +211,10 @@ impl Code {
 
 impl Data {
     const ID: u8 = 0x0b;
+
+    pub fn new(data: Vec<DataEntry>) -> Data {
+        Data { data }
+    }
 }
 
 impl CodeEntry {
@@ -130,6 +226,68 @@ impl CodeEntry {
 impl Expression {
     pub fn new(instructions: Vec<Box<dyn instructions::Instruction>>) -> Expression {
         Expression { instructions }
+    }
+}
+
+impl ImportEntry {
+    pub fn new(module: Name, name: Name, import_description: ImportDescription) -> ImportEntry {
+        ImportEntry {
+            module,
+            name,
+            import_description,
+        }
+    }
+}
+
+impl Name {
+    pub fn new(name: String) -> Name {
+        Name { name }
+    }
+}
+
+impl GlobalEntry {
+    pub fn new(global_type: types::GlobalType, expression: Expression) -> GlobalEntry {
+        GlobalEntry {
+            global_type,
+            expression,
+        }
+    }
+}
+
+impl ExportEntry {
+    pub fn new(name: Name, export_description: ExportDescription) -> ExportEntry {
+        ExportEntry {
+            name,
+            export_description,
+        }
+    }
+}
+
+impl ElementEntry {
+    pub fn new(
+        table_id: indices::TableId,
+        offset: Expression,
+        initialization: Vec<indices::FunctionId>,
+    ) -> ElementEntry {
+        ElementEntry {
+            table_id,
+            offset,
+            initialization,
+        }
+    }
+}
+
+impl DataEntry {
+    pub fn new(
+        memory_id: indices::MemoryId,
+        offset: Expression,
+        initialization: Vec<u8>,
+    ) -> DataEntry {
+        DataEntry {
+            memory_id,
+            offset,
+            initialization,
+        }
     }
 }
 
@@ -156,9 +314,6 @@ impl super::Encode for Expression {
             output.extend_from_slice(&instruction.encode());
         }
 
-        // Or demand that there is an end instruction in the instructions
-        //output.extend_from_slice(&super::instructions::end().encode());
-
         output
     }
 }
@@ -170,6 +325,137 @@ impl super::Encode for Locals {
 
         output.extend_from_slice(&self.n.encode());
         output.extend_from_slice(&self.value_type.encode());
+
+        output
+    }
+}
+
+impl super::Encode for ImportEntry {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut output = Vec::new();
+
+        output.extend_from_slice(&self.module.encode());
+        output.extend_from_slice(&self.name.encode());
+        output.extend_from_slice(&self.import_description.encode());
+
+        output
+    }
+}
+
+impl super::Encode for Name {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let result = self.name.clone().into_bytes();
+
+        let mut output = Vec::new();
+        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        output.extend_from_slice(&result);
+        output
+    }
+}
+
+impl super::Encode for ImportDescription {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        match self {
+            ImportDescription::Function(type_id) => {
+                let mut output = vec![0x00];
+                output.extend_from_slice(&type_id.encode());
+                output
+            }
+            ImportDescription::Table(table_type) => {
+                let mut output = vec![0x01];
+                output.extend_from_slice(&table_type.encode());
+                output
+            }
+            ImportDescription::Memory(memory_type) => {
+                let mut output = vec![0x02];
+                output.extend_from_slice(&memory_type.encode());
+                output
+            }
+            ImportDescription::Global(global_type) => {
+                let mut output = vec![0x03];
+                output.extend_from_slice(&global_type.encode());
+                output
+            }
+        }
+    }
+}
+
+impl Encode for GlobalEntry {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut output = Vec::new();
+
+        output.extend_from_slice(&self.global_type.encode());
+        output.extend_from_slice(&self.expression.encode());
+
+        output
+    }
+}
+
+impl Encode for ExportEntry {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut output = Vec::new();
+
+        output.extend_from_slice(&self.name.encode());
+        output.extend_from_slice(&self.export_description.encode());
+
+        output
+    }
+}
+
+impl Encode for ExportDescription {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        match self {
+            ExportDescription::Function(function_id) => {
+                let mut output = vec![0x00];
+                output.extend_from_slice(&function_id.encode());
+                output
+            }
+            ExportDescription::Table(table_id) => {
+                let mut output = vec![0x01];
+                output.extend_from_slice(&table_id.encode());
+                output
+            }
+            ExportDescription::Memory(memory_id) => {
+                let mut output = vec![0x02];
+                output.extend_from_slice(&memory_id.encode());
+                output
+            }
+            ExportDescription::Global(global_id) => {
+                let mut output = vec![0x03];
+                output.extend_from_slice(&global_id.encode());
+                output
+            }
+        }
+    }
+}
+
+impl Encode for ElementEntry {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut output = Vec::new();
+
+        output.extend_from_slice(&self.table_id.encode());
+        output.extend_from_slice(&self.offset.encode());
+        output.extend_from_slice(&self.initialization.encode());
+
+        output
+    }
+}
+
+impl Encode for DataEntry {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut output = Vec::new();
+
+        output.extend_from_slice(&self.memory_id.encode());
+        output.extend_from_slice(&self.offset.encode());
+        output.extend_from_slice(&self.initialization);
 
         output
     }
@@ -190,7 +476,20 @@ impl Encode for Type {
     }
 }
 
-// impl Section for Import {}
+impl Section for Import {}
+
+impl Encode for Import {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let result = self.imports.encode();
+
+        let mut output = Vec::new();
+        output.push(Import::ID);
+        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        output.extend_from_slice(&result);
+        output
+    }
+}
 
 impl Section for Function {}
 
@@ -207,13 +506,65 @@ impl Encode for Function {
     }
 }
 
-// impl Section for Table {}
+impl Section for Table {}
 
-// impl Section for Memory {}
+impl Encode for Table {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let result = self.tables.encode();
 
-// impl Section for Global {}
+        let mut output = Vec::new();
+        output.push(Table::ID);
+        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        output.extend_from_slice(&result);
+        output
+    }
+}
 
-// impl Section for Export {}
+impl Section for Memory {}
+
+impl Encode for Memory {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let result = self.memories.encode();
+
+        let mut output = Vec::new();
+        output.push(Memory::ID);
+        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        output.extend_from_slice(&result);
+        output
+    }
+}
+
+impl Section for Global {}
+
+impl Encode for Global {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let result = self.globals.encode();
+
+        let mut output = Vec::new();
+        output.push(Global::ID);
+        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        output.extend_from_slice(&result);
+        output
+    }
+}
+
+impl Section for Export {}
+
+impl Encode for Export {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let result = self.exports.encode();
+
+        let mut output = Vec::new();
+        output.push(Export::ID);
+        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        output.extend_from_slice(&result);
+        output
+    }
+}
 
 impl Section for Start {}
 
@@ -230,7 +581,20 @@ impl Encode for Start {
     }
 }
 
-// impl Section for Element {}
+impl Section for Element {}
+
+impl Encode for Element {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let result = &self.elements.encode();
+
+        let mut output = Vec::new();
+        output.push(Element::ID);
+        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        output.extend_from_slice(&result);
+        output
+    }
+}
 
 impl Section for Code {}
 
@@ -247,4 +611,17 @@ impl Encode for Code {
     }
 }
 
-// impl Section for Data {}
+impl Section for Data {}
+
+impl Encode for Data {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let result = &self.data.encode();
+
+        let mut output = Vec::new();
+        output.push(Data::ID);
+        leb128::write::unsigned(&mut output, result.len() as u64).unwrap();
+        output.extend_from_slice(&result);
+        output
+    }
+}
