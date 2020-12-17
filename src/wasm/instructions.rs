@@ -1,4 +1,4 @@
-use super::opcodes::Opcode;
+use super::{indices, opcodes::Opcode, types, Encode};
 
 pub fn unreachable() -> impl Instruction {
     ParameterlessInstruction {
@@ -12,21 +12,21 @@ pub fn nop() -> impl Instruction {
     }
 }
 
-pub fn block(block_type: BlockType) -> impl Instruction {
+pub fn block(block_type: types::BlockType) -> impl Instruction {
     BlockInstruction {
         opcode: Opcode::Block,
         block_type,
     }
 }
 
-pub fn loop_instruction(block_type: BlockType) -> impl Instruction {
+pub fn loop_instruction(block_type: types::BlockType) -> impl Instruction {
     BlockInstruction {
         opcode: Opcode::Loop,
         block_type,
     }
 }
 
-pub fn if_instruction(block_type: BlockType) -> impl Instruction {
+pub fn if_instruction(block_type: types::BlockType) -> impl Instruction {
     BlockInstruction {
         opcode: Opcode::If,
         block_type,
@@ -45,24 +45,27 @@ pub fn end() -> impl Instruction {
     }
 }
 
-pub fn br(label_index: LabelIndex) -> impl Instruction {
-    LabelInstruction {
+pub fn br(label_index: indices::LabelId) -> impl Instruction {
+    BranchInstruction {
         opcode: Opcode::Br,
         label_index,
     }
 }
 
-pub fn br_if(label_index: LabelIndex) -> impl Instruction {
-    LabelInstruction {
+pub fn br_if(label_index: indices::LabelId) -> impl Instruction {
+    BranchInstruction {
         opcode: Opcode::BrIf,
         label_index,
     }
 }
 
-pub fn br_table(labels_vector: Vec<LabelIndex>, label_index: LabelIndex) -> impl Instruction {
-    IndirectLabelInstruction {
+pub fn br_table(
+    label_vector: Vec<indices::LabelId>,
+    label_index: indices::LabelId,
+) -> impl Instruction {
+    IndirectBranchInstruction {
         opcode: Opcode::BrTable,
-        labels_vector,
+        label_vector,
         label_index,
     }
 }
@@ -73,17 +76,18 @@ pub fn return_instruction() -> impl Instruction {
     }
 }
 
-pub fn call(function_index: FunctionIndex) -> impl Instruction {
-    FunctionInstruction {
+pub fn call(function_index: indices::FunctionId) -> impl Instruction {
+    CallInstruction {
         opcode: Opcode::Call,
         function_index,
     }
 }
 
-pub fn call_indirect(type_index: TypeIndex) -> impl Instruction {
-    FunctionIndirectInstruction {
+pub fn call_indirect(type_index: indices::TypeId) -> impl Instruction {
+    CallIndirectInstruction {
         opcode: Opcode::CallIndirect,
         type_index,
+        table_index: indices::TableId::default(),
     }
 }
 
@@ -99,35 +103,35 @@ pub fn select() -> impl Instruction {
     }
 }
 
-pub fn local_get(local_index: LocalIndex) -> impl Instruction {
+pub fn local_get(local_index: indices::LocalId) -> impl Instruction {
     LocalInstruction {
         opcode: Opcode::LocalGet,
         local_index,
     }
 }
 
-pub fn local_set(local_index: LocalIndex) -> impl Instruction {
+pub fn local_set(local_index: indices::LocalId) -> impl Instruction {
     LocalInstruction {
         opcode: Opcode::LocalSet,
         local_index,
     }
 }
 
-pub fn local_tee(local_index: LocalIndex) -> impl Instruction {
+pub fn local_tee(local_index: indices::LocalId) -> impl Instruction {
     LocalInstruction {
         opcode: Opcode::LocalTee,
         local_index,
     }
 }
 
-pub fn global_get(global_index: GlobalIndex) -> impl Instruction {
+pub fn global_get(global_index: indices::GlobalId) -> impl Instruction {
     GlobalInstruction {
         opcode: Opcode::GlobalGet,
         global_index,
     }
 }
 
-pub fn global_set(global_index: GlobalIndex) -> impl Instruction {
+pub fn global_set(global_index: indices::GlobalId) -> impl Instruction {
     GlobalInstruction {
         opcode: Opcode::GlobalSet,
         global_index,
@@ -296,14 +300,16 @@ pub fn i64_store_32(memory_argument: MemoryArgument) -> impl Instruction {
 }
 
 pub fn memory_size() -> impl Instruction {
-    MemoryIndexInstruction {
+    DirectMemoryInstruction {
         opcode: Opcode::MemorySize,
+        memory_index: indices::MemoryId::default(),
     }
 }
 
 pub fn memory_grow() -> impl Instruction {
-    MemoryIndexInstruction {
+    DirectMemoryInstruction {
         opcode: Opcode::MemoryGrow,
+        memory_index: indices::MemoryId::default(),
     }
 }
 
@@ -1073,111 +1079,230 @@ pub fn f64_reinterpret_i64() -> impl Instruction {
     }
 }
 
-pub trait Instruction {}
+pub trait Instruction: Encode + std::fmt::Debug {}
 
+#[derive(Debug)]
 pub struct ParameterlessInstruction {
     opcode: Opcode,
 }
 
 impl Instruction for ParameterlessInstruction {}
 
+impl Encode for ParameterlessInstruction {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        self.opcode.encode()
+    }
+}
+
+#[derive(Debug)]
 pub struct BlockInstruction {
     opcode: Opcode,
-    block_type: BlockType,
+    block_type: types::BlockType,
 }
 
 impl Instruction for BlockInstruction {}
 
-pub struct LabelInstruction {
-    opcode: Opcode,
-    label_index: LabelIndex,
+impl Encode for BlockInstruction {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut result = self.opcode.encode();
+        result.extend_from_slice(&self.block_type.encode());
+        result
+    }
 }
 
-impl Instruction for LabelInstruction {}
-
-pub struct IndirectLabelInstruction {
+#[derive(Debug)]
+pub struct BranchInstruction {
     opcode: Opcode,
-    labels_vector: Vec<LabelIndex>,
-    label_index: LabelIndex,
+    label_index: indices::LabelId,
 }
 
-impl Instruction for IndirectLabelInstruction {}
-
-pub struct FunctionInstruction {
-    opcode: Opcode,
-    function_index: FunctionIndex,
+impl Encode for BranchInstruction {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut result = self.opcode.encode();
+        result.extend_from_slice(&self.label_index.encode());
+        result
+    }
 }
 
-impl Instruction for FunctionInstruction {}
+impl Instruction for BranchInstruction {}
 
-pub struct FunctionIndirectInstruction {
+#[derive(Debug)]
+pub struct IndirectBranchInstruction {
     opcode: Opcode,
-    type_index: TypeIndex,
+    label_vector: Vec<indices::LabelId>,
+    label_index: indices::LabelId,
 }
 
-impl Instruction for FunctionIndirectInstruction {}
+impl Encode for IndirectBranchInstruction {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut result = self.opcode.encode();
+        result.extend_from_slice(&self.label_vector.encode());
+        result.extend_from_slice(&self.label_index.encode());
+        result
+    }
+}
 
+impl Instruction for IndirectBranchInstruction {}
+
+#[derive(Debug)]
+pub struct CallInstruction {
+    opcode: Opcode,
+    function_index: indices::FunctionId,
+}
+
+impl Encode for CallInstruction {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut result = self.opcode.encode();
+        result.extend_from_slice(&self.function_index.encode());
+        result
+    }
+}
+
+impl Instruction for CallInstruction {}
+
+#[derive(Debug)]
+pub struct CallIndirectInstruction {
+    opcode: Opcode,
+    type_index: indices::TypeId,
+    table_index: indices::TableId,
+}
+
+impl Encode for CallIndirectInstruction {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut result = self.opcode.encode();
+        result.extend_from_slice(&self.type_index.encode());
+        // Is table_index actually encoded as 0x00 byte?
+        result.extend_from_slice(&self.table_index.encode());
+        result
+    }
+}
+
+impl Instruction for CallIndirectInstruction {}
+
+#[derive(Debug)]
 pub struct LocalInstruction {
     opcode: Opcode,
-    local_index: LocalIndex,
+    local_index: indices::LocalId,
+}
+
+impl Encode for LocalInstruction {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut result = self.opcode.encode();
+        result.extend_from_slice(&self.local_index.encode());
+        result
+    }
 }
 
 impl Instruction for LocalInstruction {}
 
+#[derive(Debug)]
 pub struct GlobalInstruction {
     opcode: Opcode,
-    global_index: GlobalIndex,
+    global_index: indices::GlobalId,
+}
+
+impl Encode for GlobalInstruction {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut result = self.opcode.encode();
+        result.extend_from_slice(&self.global_index.encode());
+        result
+    }
 }
 
 impl Instruction for GlobalInstruction {}
 
+#[derive(Debug)]
 pub struct MemoryInstruction {
     opcode: Opcode,
     memory_argument: MemoryArgument,
 }
 
-impl Instruction for MemoryInstruction {}
-
-pub struct MemoryIndexInstruction {
-    opcode: Opcode,
+impl Encode for MemoryInstruction {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut result = self.opcode.encode();
+        result.extend_from_slice(&self.memory_argument.encode());
+        result
+    }
 }
 
-impl Instruction for MemoryIndexInstruction {}
+impl Instruction for MemoryInstruction {}
 
+#[derive(Debug)]
+pub struct DirectMemoryInstruction {
+    opcode: Opcode,
+    memory_index: indices::MemoryId,
+}
+
+impl Encode for DirectMemoryInstruction {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut result = self.opcode.encode();
+        // Is memory_index actually encoded as 0x00 byte?
+        result.extend_from_slice(&self.memory_index.encode());
+        result
+    }
+}
+
+impl Instruction for DirectMemoryInstruction {}
+
+#[derive(Debug)]
 pub struct NumericInstruction {
     opcode: Opcode,
     numeric_argument: NumericArgument,
 }
 
-impl Instruction for NumericInstruction {}
-
-// TODO: make sure it is represented correctly (i.e. check this TypeIndex thing in block type)
-pub enum BlockType {
-    EmptyType,
-    ValueType(ValueType),
-    TypeIndex(i32),
+impl Encode for NumericInstruction {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut result = self.opcode.encode();
+        result.extend_from_slice(&self.numeric_argument.encode());
+        result
+    }
 }
 
-pub enum ValueType {}
+impl Instruction for NumericInstruction {}
 
-pub struct LabelIndex(u32);
-
-pub struct FunctionIndex(u32);
-
-pub struct TypeIndex(u32);
-
-pub struct LocalIndex(u32);
-
-pub struct GlobalIndex(u32);
-
+#[derive(Debug)]
 pub struct MemoryArgument {
     align: u32,
     offset: u32,
 }
 
+impl Encode for MemoryArgument {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut result = Vec::new();
+        leb128::write::unsigned(&mut result, self.align as u64).unwrap();
+        leb128::write::unsigned(&mut result, self.offset as u64).unwrap();
+        result
+    }
+}
+
+#[derive(Debug)]
 pub enum NumericArgument {
     I32(i32),
     I64(i64),
     F32(f32),
     F64(f64),
+}
+
+impl Encode for NumericArgument {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        match self {
+            NumericArgument::I32(number) => number.encode(),
+            NumericArgument::I64(number) => number.encode(),
+            NumericArgument::F32(number) => number.encode(),
+            NumericArgument::F64(number) => number.encode(),
+        }
+    }
 }

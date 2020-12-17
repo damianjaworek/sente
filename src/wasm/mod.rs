@@ -1,20 +1,76 @@
+pub mod indices;
 pub mod instructions;
+pub mod module;
 pub mod opcodes;
+pub mod sections;
+pub mod types;
 
-pub fn encode_vector(vector: &[u8]) -> Vec<u8> {
-    let mut encoded_vector = Vec::new();
-    leb128::write::unsigned(&mut encoded_vector, vector.len() as u64).unwrap();
-    encoded_vector.extend_from_slice(vector);
-    encoded_vector
+pub trait Encode {
+    fn encode(&self) -> Vec<u8>;
 }
 
-pub fn encode_nested_vector<T>(vector: &mut [T]) -> Vec<u8>
+impl<T> Encode for Vec<T>
 where
-    T: Iterator<Item = u8>,
+    T: Encode + std::fmt::Debug,
 {
-    let mut encoded_vector = Vec::new();
-    leb128::write::unsigned(&mut encoded_vector, vector.len() as u64).unwrap();
-    let flattened = vector.iter_mut().flatten().collect::<Vec<u8>>();
-    encoded_vector.extend_from_slice(&flattened);
-    encoded_vector
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut result = Vec::new();
+        leb128::write::unsigned(&mut result, self.len() as u64).unwrap();
+
+        for item in self {
+            result.extend_from_slice(&item.encode());
+        }
+        result
+    }
+}
+
+impl Encode for i32 {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut result = Vec::new();
+        leb128::write::signed(&mut result, *self as i64).unwrap();
+        result
+    }
+}
+
+impl Encode for i64 {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut result = Vec::new();
+        leb128::write::signed(&mut result, *self).unwrap();
+        result
+    }
+}
+
+impl Encode for u32 {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut result = Vec::new();
+        leb128::write::unsigned(&mut result, *self as u64).unwrap();
+        result
+    }
+}
+
+impl Encode for u64 {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        let mut result = Vec::new();
+        leb128::write::unsigned(&mut result, *self).unwrap();
+        result
+    }
+}
+
+impl Encode for f32 {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        self.to_le_bytes().to_vec()
+    }
+}
+
+impl Encode for f64 {
+    fn encode(&self) -> Vec<u8> {
+        dbg!(self);
+        self.to_le_bytes().to_vec()
+    }
 }

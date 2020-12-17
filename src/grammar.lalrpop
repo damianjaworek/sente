@@ -1,35 +1,35 @@
-use std::str::FromStr;
-use crate::ast::{Expr, Opcode, Stmts};
+use crate::ast::{Expression, Operator, Number};
 
 grammar;
 
-pub Stmts: Stmts = (<Expr> ";")* => Stmts::new(<>);
+pub Exprs: Vec<Box<Expression>> = (<Expr> ";")* => <>;
 
-Expr: Box<Expr> = {
-    Expr ExprOp Factor => Box::new(Expr::Op(<>)),
+Expr: Box<Expression> = {
+    Expr ExprOp Factor => Box::new(Expression::Operation(<>)),
     Factor,
 };
 
-ExprOp: Opcode = {
-    "+" => Opcode::Add,
-    "-" => Opcode::Sub,
+ExprOp: Operator = {
+    "+" => Operator::Add,
+    "-" => Operator::Subtract,
 }
 
-Factor: Box<Expr> = {
-    Factor FactorOp Term => Box::new(Expr::Op(<>)),
+Factor: Box<Expression> = {
+    Factor FactorOp Term => Box::new(Expression::Operation(<>)),
     Term,
 };
 
-FactorOp: Opcode = {
-    "*" => Opcode::Mul,
-    "/" => Opcode::Div,
+FactorOp: Operator = {
+    "*" => Operator::Multiply,
+    "/" => Operator::Divide,
 };
 
-Term: Box<Expr> = {
-    Num => Box::new(Expr::Number(<>)),
+Term: Box<Expression> = {
+    Num => Box::new(Expression::Number(<>)),
     "(" <Expr> ")",
 };
 
-Num: i32 = {
-    r"[0-9]+" => i32::from_str(<>).unwrap(),
+Num: Number = {
+    r"[0-9]+" => Number::Integer(String::from(<>)),
+    r"[0-9]+\.[0-9]+" => Number::Float(String::from(<>)),
 };

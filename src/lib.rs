@@ -18,8 +18,8 @@ where
     let mut input = String::new();
     reader.read_to_string(&mut input)?;
 
-    let parsed_result = grammar::StmtsParser::new().parse(&input).unwrap();
-    let emitted_code = emitter::emit(&parsed_result);
+    let parsed_result = grammar::ExprsParser::new().parse(&input).unwrap();
+    let emitted_code = emitter::emit(parsed_result);
     writer.write_all(&emitted_code)?;
 
     Ok(())
