@@ -4,7 +4,8 @@ extern crate lalrpop_util;
 lalrpop_mod!(grammar);
 mod ast;
 mod emitter;
-pub mod wasm;
+mod services;
+mod wasm;
 
 use std::io::{BufReader, BufWriter, Read, Write};
 pub fn compile<R, W>(
