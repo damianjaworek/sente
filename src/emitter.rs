@@ -332,8 +332,13 @@ fn compile_function_call(
 
         compile_expression(argument, name_service, type_service, instructions)?;
 
-        if i > parameter_types.len() {
-            panic!("Too many arguments");
+        if i >= parameter_types.len() {
+            return Err(format!(
+                "Too many arguments when calling function `{}`. Expected {}, got {}",
+                function_call.identifier,
+                parameter_types.len(),
+                function_call.arguments.len(),
+            ));
         }
         convert_type_to(
             &argument_type,
@@ -344,7 +349,12 @@ fn compile_function_call(
     }
 
     if argument_types.len() != parameter_types.len() {
-        panic!("Wrong number of arguments");
+        return Err(format!(
+            "Wrong number of arguments when calling function `{}`. Expected {}, got {}",
+            function_call.identifier,
+            parameter_types.len(),
+            function_call.arguments.len()
+        ));
     }
 
     let call = wasm::instructions::call(function.get_function_id());
