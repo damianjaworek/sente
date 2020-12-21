@@ -1,35 +1,88 @@
-use crate::ast::{Expression, Operator, Number};
+use crate::ast::*;
 
 grammar;
 
-pub Exprs: Vec<Box<Expression>> = (<Expr> ";")* => <>;
+pub Program: Program = Func* => Program::with(<>);
 
-Expr: Box<Expression> = {
-    Expr ExprOp Factor => Box::new(Expression::Operation(<>)),
+Func: Function = "fn" <id:Identifier> "(" <params:Parameters> ")" "->" <t:Type> "{" <code:Statements> "}" => 
+        Function::new(params, t, code, id);
+        
+Parameters: Vec<Parameter> = Comma<Parameter>;
+
+Parameter: Parameter = <id:Identifier>":" <t:Type> => Parameter::new(t, id);
+
+Statements: Vec<Statement> = Statement* => <>;
+
+Statement: Statement = {
+    "var" <id:Identifier>":" <t:Type> "=" <e:Expression>";" => Statement::Binding(BindingStatement::new(t, id, e)),
+    <id:Identifier> "=" <e:Expression>";" => Statement::Assignment(AssignmentStatement::new(id, e)),
+    "if" "(" <c:Condition> ")" "{" <s:Statements> "}" => Statement::Conditional(ConditionalStatement::new(c, s, Vec::new())),
+    "if" "(" <c:Condition> ")" "{" <s:Statements> "}" "else" "{" <a:Statements> "}" => Statement::Conditional(ConditionalStatement::new(c, s, a)),
+    "while" "(" <c:Condition> ")" "{" <s:Statements> "}" => Statement::Loop(LoopStatement::new(c, s)),
+    "return" <e:Expression> ";" => Statement::Return(ReturnStatement::new(e)),
+}
+
+Condition: Box<Condition> = <l:Expression> <c:Comparison> <r:Expression> => Box::new(Condition::new(l, c, r));
+
+Comparison: ComparisonOperator = {
+    "<" => ComparisonOperator::LessThan,
+    "<=" => ComparisonOperator::LessThanOrEqual,
+    ">" => ComparisonOperator::GreaterThan,
+    ">=" => ComparisonOperator::GreaterThanOrEqual,
+    "==" => ComparisonOperator::Equal,
+    "!=" => ComparisonOperator::NotEqual,
+}
+
+Expression: Box<Expression> = {
+    Expression ExpressionOperator Factor => Box::new(Expression::Operation(<>)),
     Factor,
 };
 
-ExprOp: Operator = {
+ExpressionOperator: Operator = {
     "+" => Operator::Add,
     "-" => Operator::Subtract,
-}
+};
 
 Factor: Box<Expression> = {
-    Factor FactorOp Term => Box::new(Expression::Operation(<>)),
+    Factor FactorOperator Term => Box::new(Expression::Operation(<>)),
     Term,
 };
 
-FactorOp: Operator = {
+FactorOperator: Operator = {
     "*" => Operator::Multiply,
     "/" => Operator::Divide,
 };
 
 Term: Box<Expression> = {
-    Num => Box::new(Expression::Number(<>)),
-    "(" <Expr> ")",
+    <id:Identifier> "(" <a:Arguments> ")" => Box::new(Expression::FunctionCall(FunctionCallExpression::new(id, a))),
+    Number => Box::new(Expression::Number(<>)),
+    <id:Identifier> => Box::new(Expression::Variable(id)),
+    "(" <Expression> ")",
 };
 
-Num: Number = {
+Arguments: Vec<Box<Expression>> = Comma<Expression>;
+
+Type: Type = {
+    "Int32" => Type::Int32,
+    "Int64" => Type::Int64,
+    "Float32" => Type::Float32,
+    "Float64" => Type::Float64,
+};
+
+Identifier: String = r"[a-zA-Z]+" => String::from(<>);
+
+Number: Number = {
     r"[0-9]+" => Number::Integer(String::from(<>)),
     r"[0-9]+\.[0-9]+" => Number::Float(String::from(<>)),
+};
+
+Comma<T>: Vec<T> = {
+    <v:(<T> ",")*> <e:T?> => match e {
+        None => v,
+        Some(e) => {
+            let mut v = v;
+            v.push(e);
+            v
+        }
+    }
 };

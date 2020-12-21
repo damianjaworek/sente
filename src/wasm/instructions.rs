@@ -1177,7 +1177,6 @@ impl Encode for CallIndirectInstruction {
         dbg!(self);
         let mut result = self.opcode.encode();
         result.extend_from_slice(&self.type_index.encode());
-        // Is table_index actually encoded as 0x00 byte?
         result.extend_from_slice(&self.table_index.encode());
         result
     }
@@ -1246,7 +1245,6 @@ impl Encode for DirectMemoryInstruction {
     fn encode(&self) -> Vec<u8> {
         dbg!(self);
         let mut result = self.opcode.encode();
-        // Is memory_index actually encoded as 0x00 byte?
         result.extend_from_slice(&self.memory_index.encode());
         result
     }

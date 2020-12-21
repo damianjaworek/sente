@@ -64,7 +64,6 @@ pub struct CodeEntry {
 }
 
 #[derive(Debug)]
-// TODO: understand what is it
 pub struct Locals {
     n: u32,
     value_type: types::ValueType,
@@ -220,6 +219,12 @@ impl Data {
 impl CodeEntry {
     pub fn new(locals: Vec<Locals>, expression: Expression) -> CodeEntry {
         CodeEntry { locals, expression }
+    }
+}
+
+impl Locals {
+    pub fn new(n: u32, value_type: types::ValueType) -> Locals {
+        Locals { n, value_type }
     }
 }
 

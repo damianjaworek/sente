@@ -1,2 +1,16 @@
-2 + 2 * 2;
-(2 + 2) * 2;
+fn foo(a: Int32, b: Int64, c: Float32, d: Float64) -> Int64 {
+    while(a > b) {
+        if (b <= 10) {
+            var x: Int32 = 10;
+        }
+    }
+
+    var first: Int64 = a + b * b;
+    first = (2 + 2) * 2;
+    return d;
+}
+
+fn bar() -> Float64 {
+    var second: Float64 = 2.0 * 2.0 + 2.0;
+    return second;
+}

@@ -1,6 +1,6 @@
 use super::Encode;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct TypeId {
     index: u32,
 }

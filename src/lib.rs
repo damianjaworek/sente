@@ -2,10 +2,10 @@
 extern crate lalrpop_util;
 
 lalrpop_mod!(grammar);
-mod ast;
-mod emitter;
-mod services;
-mod wasm;
+pub mod ast;
+pub mod emitter;
+pub mod services;
+pub mod wasm;
 
 use std::io::{BufReader, BufWriter, Read, Write};
 pub fn compile<R, W>(
@@ -19,9 +19,21 @@ where
     let mut input = String::new();
     reader.read_to_string(&mut input)?;
 
-    let parsed_result = grammar::ExprsParser::new().parse(&input).unwrap();
-    let emitted_code = emitter::emit(parsed_result);
-    writer.write_all(&emitted_code)?;
+    match grammar::ProgramParser::new().parse(&input) {
+        Ok(parsed_program) => match emitter::emit(parsed_program) {
+            Ok(emitted_code) => {
+                writer.write_all(&emitted_code)?;
 
-    Ok(())
+                Ok(())
+            }
+            Err(error) => {
+                println!("Compiler error: {}", error);
+                Ok(())
+            }
+        },
+        Err(error) => {
+            println!("{}", error);
+            Ok(())
+        }
+    }
 }
