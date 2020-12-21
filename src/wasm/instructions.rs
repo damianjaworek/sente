@@ -1090,7 +1090,6 @@ impl Instruction for ParameterlessInstruction {}
 
 impl Encode for ParameterlessInstruction {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         self.opcode.encode()
     }
 }
@@ -1105,7 +1104,6 @@ impl Instruction for BlockInstruction {}
 
 impl Encode for BlockInstruction {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = self.opcode.encode();
         result.extend_from_slice(&self.block_type.encode());
         result
@@ -1120,7 +1118,6 @@ pub struct BranchInstruction {
 
 impl Encode for BranchInstruction {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = self.opcode.encode();
         result.extend_from_slice(&self.label_index.encode());
         result
@@ -1138,7 +1135,6 @@ pub struct IndirectBranchInstruction {
 
 impl Encode for IndirectBranchInstruction {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = self.opcode.encode();
         result.extend_from_slice(&self.label_vector.encode());
         result.extend_from_slice(&self.label_index.encode());
@@ -1156,7 +1152,6 @@ pub struct CallInstruction {
 
 impl Encode for CallInstruction {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = self.opcode.encode();
         result.extend_from_slice(&self.function_index.encode());
         result
@@ -1174,7 +1169,6 @@ pub struct CallIndirectInstruction {
 
 impl Encode for CallIndirectInstruction {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = self.opcode.encode();
         result.extend_from_slice(&self.type_index.encode());
         result.extend_from_slice(&self.table_index.encode());
@@ -1192,7 +1186,6 @@ pub struct LocalInstruction {
 
 impl Encode for LocalInstruction {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = self.opcode.encode();
         result.extend_from_slice(&self.local_index.encode());
         result
@@ -1209,7 +1202,6 @@ pub struct GlobalInstruction {
 
 impl Encode for GlobalInstruction {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = self.opcode.encode();
         result.extend_from_slice(&self.global_index.encode());
         result
@@ -1226,7 +1218,6 @@ pub struct MemoryInstruction {
 
 impl Encode for MemoryInstruction {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = self.opcode.encode();
         result.extend_from_slice(&self.memory_argument.encode());
         result
@@ -1243,7 +1234,6 @@ pub struct DirectMemoryInstruction {
 
 impl Encode for DirectMemoryInstruction {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = self.opcode.encode();
         result.extend_from_slice(&self.memory_index.encode());
         result
@@ -1260,7 +1250,6 @@ pub struct NumericInstruction {
 
 impl Encode for NumericInstruction {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = self.opcode.encode();
         result.extend_from_slice(&self.numeric_argument.encode());
         result
@@ -1277,7 +1266,6 @@ pub struct MemoryArgument {
 
 impl Encode for MemoryArgument {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = Vec::new();
         leb128::write::unsigned(&mut result, self.align as u64)
             .expect("Failed to write LEB128 number");
@@ -1297,7 +1285,6 @@ pub enum NumericArgument {
 
 impl Encode for NumericArgument {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         match self {
             NumericArgument::I32(number) => number.encode(),
             NumericArgument::I64(number) => number.encode(),

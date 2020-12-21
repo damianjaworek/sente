@@ -37,7 +37,6 @@ pub struct LabelId {
 
 impl Encode for TypeId {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = Vec::new();
         leb128::write::unsigned(&mut result, self.index as u64)
             .expect("Failed to write LEB128 number");
@@ -47,7 +46,6 @@ impl Encode for TypeId {
 
 impl Encode for FunctionId {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = Vec::new();
         leb128::write::unsigned(&mut result, self.index as u64)
             .expect("Failed to write LEB128 number");
@@ -57,7 +55,6 @@ impl Encode for FunctionId {
 
 impl Encode for TableId {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = Vec::new();
         leb128::write::unsigned(&mut result, self.index as u64)
             .expect("Failed to write LEB128 number");
@@ -67,7 +64,6 @@ impl Encode for TableId {
 
 impl Encode for MemoryId {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = Vec::new();
         leb128::write::unsigned(&mut result, self.index as u64)
             .expect("Failed to write LEB128 number");
@@ -77,7 +73,6 @@ impl Encode for MemoryId {
 
 impl Encode for GlobalId {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = Vec::new();
         leb128::write::unsigned(&mut result, self.index as u64)
             .expect("Failed to write LEB128 number");
@@ -87,7 +82,6 @@ impl Encode for GlobalId {
 
 impl Encode for LocalId {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = Vec::new();
         leb128::write::unsigned(&mut result, self.index as u64)
             .expect("Failed to write LEB128 number");
@@ -97,7 +91,6 @@ impl Encode for LocalId {
 
 impl Encode for LabelId {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = Vec::new();
         leb128::write::unsigned(&mut result, self.index as u64)
             .expect("Failed to write LEB128 number");

@@ -18,7 +18,6 @@ impl Module {
     }
 
     pub fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut output = Vec::new();
         output.extend_from_slice(&Module::MAGIC_HEADER);
         output.extend_from_slice(&self.version);

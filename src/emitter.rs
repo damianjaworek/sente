@@ -5,23 +5,25 @@ fn compile_number_expression(
     _name_service: &mut services::NameService,
     _type_service: &mut services::TypeService,
     instructions: &mut Vec<Box<dyn wasm::instructions::Instruction>>,
-) {
+) -> Result<(), String> {
     match number {
         ast::Number::Integer(integer) => {
             let parsed_integer: i64 = integer
                 .parse()
-                .unwrap_or_else(|_| panic!("Cannot parse integer: {}", integer));
+                .map_err(|_| format!("`{}` is not a correct 64 bit integer", integer))?;
             let i64_const = wasm::instructions::i64_const(parsed_integer);
             instructions.push(Box::new(i64_const));
         }
         ast::Number::Float(float) => {
             let parsed_float: f64 = float
                 .parse()
-                .unwrap_or_else(|_| panic!("Cannot parse float: {}", float));
+                .map_err(|_| format!("`{}` is not a correct floating point number", float))?;
             let f64_const = wasm::instructions::f64_const(parsed_float);
             instructions.push(Box::new(f64_const));
         }
     }
+
+    Ok(())
 }
 
 fn compile_variable_expression(
@@ -359,7 +361,7 @@ fn compile_expression(
 ) -> Result<(), String> {
     match expression {
         ast::Expression::Number(number) => {
-            compile_number_expression(number, name_service, type_service, instructions)
+            compile_number_expression(number, name_service, type_service, instructions)?
         }
         ast::Expression::Variable(variable_name) => {
             compile_variable_expression(variable_name, name_service, type_service, instructions)?

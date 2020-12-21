@@ -298,7 +298,6 @@ impl DataEntry {
 
 impl super::Encode for CodeEntry {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = Vec::new();
         result.extend_from_slice(&self.locals.encode());
         result.extend_from_slice(&self.expression.encode());
@@ -313,7 +312,6 @@ impl super::Encode for CodeEntry {
 
 impl super::Encode for Expression {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut output = Vec::new();
 
         for instruction in &self.instructions {
@@ -326,7 +324,6 @@ impl super::Encode for Expression {
 
 impl super::Encode for Locals {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut output = Vec::new();
 
         output.extend_from_slice(&self.n.encode());
@@ -338,7 +335,6 @@ impl super::Encode for Locals {
 
 impl super::Encode for ImportEntry {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut output = Vec::new();
 
         output.extend_from_slice(&self.module.encode());
@@ -351,7 +347,6 @@ impl super::Encode for ImportEntry {
 
 impl super::Encode for Name {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let result = self.name.clone().into_bytes();
 
         let mut output = Vec::new();
@@ -364,7 +359,6 @@ impl super::Encode for Name {
 
 impl super::Encode for ImportDescription {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         match self {
             ImportDescription::Function(type_id) => {
                 let mut output = vec![0x00];
@@ -392,7 +386,6 @@ impl super::Encode for ImportDescription {
 
 impl Encode for GlobalEntry {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut output = Vec::new();
 
         output.extend_from_slice(&self.global_type.encode());
@@ -404,7 +397,6 @@ impl Encode for GlobalEntry {
 
 impl Encode for ExportEntry {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut output = Vec::new();
 
         output.extend_from_slice(&self.name.encode());
@@ -416,7 +408,6 @@ impl Encode for ExportEntry {
 
 impl Encode for ExportDescription {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         match self {
             ExportDescription::Function(function_id) => {
                 let mut output = vec![0x00];
@@ -444,7 +435,6 @@ impl Encode for ExportDescription {
 
 impl Encode for ElementEntry {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut output = Vec::new();
 
         output.extend_from_slice(&self.table_id.encode());
@@ -457,7 +447,6 @@ impl Encode for ElementEntry {
 
 impl Encode for DataEntry {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut output = Vec::new();
 
         output.extend_from_slice(&self.memory_id.encode());
@@ -472,7 +461,6 @@ impl Section for Type {}
 
 impl Encode for Type {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let result = self.types.encode();
 
         let mut output = Vec::new();
@@ -488,7 +476,6 @@ impl Section for Import {}
 
 impl Encode for Import {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let result = self.imports.encode();
 
         let mut output = Vec::new();
@@ -504,7 +491,6 @@ impl Section for Function {}
 
 impl Encode for Function {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let result = self.functions.encode();
 
         let mut output = Vec::new();
@@ -520,7 +506,6 @@ impl Section for Table {}
 
 impl Encode for Table {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let result = self.tables.encode();
 
         let mut output = Vec::new();
@@ -536,7 +521,6 @@ impl Section for Memory {}
 
 impl Encode for Memory {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let result = self.memories.encode();
 
         let mut output = Vec::new();
@@ -552,7 +536,6 @@ impl Section for Global {}
 
 impl Encode for Global {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let result = self.globals.encode();
 
         let mut output = Vec::new();
@@ -568,7 +551,6 @@ impl Section for Export {}
 
 impl Encode for Export {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let result = self.exports.encode();
 
         let mut output = Vec::new();
@@ -584,7 +566,6 @@ impl Section for Start {}
 
 impl Encode for Start {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let result = self.start.encode();
 
         let mut output = Vec::new();
@@ -600,7 +581,6 @@ impl Section for Element {}
 
 impl Encode for Element {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let result = &self.elements.encode();
 
         let mut output = Vec::new();
@@ -616,7 +596,6 @@ impl Section for Code {}
 
 impl Encode for Code {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let result = &self.codes.encode();
 
         let mut output = Vec::new();
@@ -632,7 +611,6 @@ impl Section for Data {}
 
 impl Encode for Data {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let result = &self.data.encode();
 
         let mut output = Vec::new();

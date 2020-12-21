@@ -86,7 +86,6 @@ impl TableType {
 
 impl Encode for BlockType {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         match self {
             BlockType::Empty => vec![0x40],
             BlockType::Value(value_type) => value_type.encode(),
@@ -97,7 +96,6 @@ impl Encode for BlockType {
 
 impl Encode for ValueType {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         match self {
             ValueType::I32 => vec![0x7f],
             ValueType::I64 => vec![0x7e],
@@ -109,14 +107,12 @@ impl Encode for ValueType {
 
 impl Encode for ResultType {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         self.types.encode()
     }
 }
 
 impl Encode for FunctionType {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = vec![0x60];
         result.extend_from_slice(&self.parameters.encode());
         result.extend_from_slice(&self.results.encode());
@@ -126,7 +122,6 @@ impl Encode for FunctionType {
 
 impl Encode for ReferenceType {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         match self {
             ReferenceType::Func => vec![0x70],
         }
@@ -135,7 +130,6 @@ impl Encode for ReferenceType {
 
 impl Encode for Limits {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = Vec::new();
 
         match self {
@@ -159,14 +153,12 @@ impl Encode for Limits {
 
 impl Encode for MemoryType {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         self.limits.encode()
     }
 }
 
 impl Encode for TableType {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         let mut result = self.element_type.encode();
         result.extend_from_slice(&self.limits.encode());
         result
@@ -175,7 +167,6 @@ impl Encode for TableType {
 
 impl Encode for GlobalType {
     fn encode(&self) -> Vec<u8> {
-        dbg!(self);
         match self {
             GlobalType::Const(value_type) => {
                 let mut result = value_type.encode();
