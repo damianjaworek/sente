@@ -1,8 +1,13 @@
+//! Module defining types used to construct an AST.
+
+/// Type representing a whole program.
 #[derive(Clone)]
 pub struct Program {
+    /// Functions defined in the program.
     pub functions: Vec<Function>,
 }
 
+/// Type representing a function in a program.
 #[derive(Clone)]
 pub struct Function {
     pub parameters: Vec<Parameter>,
@@ -11,12 +16,14 @@ pub struct Function {
     pub identifier: String,
 }
 
+/// Type representing a parameter of a function.
 #[derive(Clone)]
 pub struct Parameter {
     pub parameter_type: Type,
     pub identifier: String,
 }
 
+/// Type representing a statement in a program.
 #[derive(Clone)]
 pub enum Statement {
     Binding(BindingStatement),
@@ -26,6 +33,7 @@ pub enum Statement {
     Return(ReturnStatement),
 }
 
+/// Type representing a binding in a program.
 #[derive(Clone)]
 pub struct BindingStatement {
     pub binding_type: Type,
@@ -33,12 +41,14 @@ pub struct BindingStatement {
     pub expression: Box<Expression>,
 }
 
+/// Type representing a assignment in a program.
 #[derive(Clone)]
 pub struct AssignmentStatement {
     pub identifier: String,
     pub expression: Box<Expression>,
 }
 
+/// Type representing a conditional in a program.
 #[derive(Clone)]
 pub struct ConditionalStatement {
     pub condition: Box<Condition>,
@@ -46,17 +56,20 @@ pub struct ConditionalStatement {
     pub alternative: Vec<Statement>,
 }
 
+/// Type representing a loop in a program.
 #[derive(Clone)]
 pub struct LoopStatement {
     pub condition: Box<Condition>,
     pub body: Vec<Statement>,
 }
 
+/// Type representing a return statement in a program.
 #[derive(Clone)]
 pub struct ReturnStatement {
     pub expression: Box<Expression>,
 }
 
+/// Type representing a condition in a program.
 #[derive(Clone)]
 pub struct Condition {
     pub left: Box<Expression>,
@@ -64,6 +77,7 @@ pub struct Condition {
     pub right: Box<Expression>,
 }
 
+/// Type representing a comparison operator in a program.
 #[derive(Clone)]
 pub enum ComparisonOperator {
     LessThan,
@@ -74,6 +88,7 @@ pub enum ComparisonOperator {
     NotEqual,
 }
 
+/// Type representing a type used in program's code.
 #[derive(Clone)]
 pub enum Type {
     Int32,
@@ -82,6 +97,7 @@ pub enum Type {
     Float64,
 }
 
+/// Type representing an expression in a program.
 #[derive(Clone)]
 pub enum Expression {
     Number(Number),
@@ -90,6 +106,7 @@ pub enum Expression {
     FunctionCall(FunctionCallExpression),
 }
 
+/// Type representing a function call in a program.
 #[derive(Clone)]
 pub struct FunctionCallExpression {
     pub identifier: String,
@@ -97,6 +114,7 @@ pub struct FunctionCallExpression {
     pub arguments: Vec<Box<Expression>>,
 }
 
+/// Type representing an operator in an arithmetic expression in a program.
 #[derive(Clone)]
 pub enum Operator {
     Multiply,
@@ -105,12 +123,14 @@ pub enum Operator {
     Subtract,
 }
 
+/// Type representing a number in a program.
 #[derive(Clone)]
 pub enum Number {
     Integer(String),
     Float(String),
 }
 
+/// Type representing a type of an expression in a program.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ExpressionType {
     Int32,

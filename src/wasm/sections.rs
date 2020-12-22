@@ -1,3 +1,4 @@
+//! Module defining types representing sections of a WebAssembly module described in WebAssembly's specification.
 use super::{indices, instructions, types, Encode};
 
 pub trait Section: Encode + std::fmt::Debug {}

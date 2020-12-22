@@ -1,3 +1,4 @@
+//! Module defining instructions described in WebAssembly's specification.
 use super::{indices, opcodes::Opcode, types, Encode};
 
 pub fn unreachable() -> impl Instruction {

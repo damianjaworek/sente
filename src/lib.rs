@@ -1,3 +1,5 @@
+//! Library defining all components necessary to compile Sente programs to WebAssembly
+
 #[macro_use]
 extern crate lalrpop_util;
 
@@ -8,6 +10,9 @@ pub mod services;
 pub mod wasm;
 
 use std::io::{BufReader, BufWriter, Read, Write};
+/// Compiles Sente code read from reader and writes the result with writer.
+/// Prints compile errors to the standard output.
+/// Calls [grammar::ProgramParser::parse] and [emitter::emit].
 pub fn compile<R, W>(
     reader: &mut BufReader<R>,
     writer: &mut BufWriter<W>,

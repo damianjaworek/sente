@@ -1,3 +1,4 @@
+//! Module defining types used to represent elements of WebAssembly binary code.
 pub mod indices;
 pub mod instructions;
 pub mod module;
@@ -5,6 +6,7 @@ pub mod opcodes;
 pub mod sections;
 pub mod types;
 
+/// Trait used to encoding object to bytes in a way that is described by WebAssembly's specification.
 pub trait Encode {
     fn encode(&self) -> Vec<u8>;
 }

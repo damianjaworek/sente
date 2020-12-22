@@ -1,3 +1,4 @@
+//! Module defining all ids described by WebAssembly's specification.
 use super::Encode;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

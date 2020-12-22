@@ -1,3 +1,4 @@
+//! Module defining functions used to emit WebAssembly code using AST.
 use crate::{ast, services, wasm};
 
 fn compile_number_expression(
@@ -636,6 +637,9 @@ fn compile_loop_statement(
     instructions: &mut Vec<Box<dyn wasm::instructions::Instruction>>,
     type_id: wasm::indices::TypeId,
 ) -> Result<(), String> {
+    let block = wasm::instructions::block(wasm::types::BlockType::Empty);
+    instructions.push(Box::new(block));
+
     let loop_instruction = wasm::instructions::loop_instruction(wasm::types::BlockType::Empty);
     instructions.push(Box::new(loop_instruction));
 
@@ -649,7 +653,7 @@ fn compile_loop_statement(
     let i32_eqz = wasm::instructions::i32_eqz();
     instructions.push(Box::new(i32_eqz));
 
-    let br_if = wasm::instructions::br_if(wasm::indices::LabelId::new(0));
+    let br_if = wasm::instructions::br_if(wasm::indices::LabelId::new(1));
     instructions.push(Box::new(br_if));
 
     let mut enclosed_name_service = services::NameService::enclosed(name_service.clone());
@@ -662,10 +666,16 @@ fn compile_loop_statement(
         type_id,
     )?;
 
+    let br = wasm::instructions::br(wasm::indices::LabelId::new(0));
+    instructions.push(Box::new(br));
+
     name_service.next_local_id = enclosed_name_service.next_local_id;
 
-    let end_instruction = wasm::instructions::end();
-    instructions.push(Box::new(end_instruction));
+    let end_loop = wasm::instructions::end();
+    instructions.push(Box::new(end_loop));
+
+    let end_block = wasm::instructions::end();
+    instructions.push(Box::new(end_block));
 
     Ok(())
 }
@@ -852,6 +862,9 @@ fn compile_program(
     Ok(wasm::module::Module::with(sections))
 }
 
+/// Emits WebAssembly code corresponding to the AST it receives as a parameter.
+/// Returns vector of bytes representing binary WebAssembly module or an error.
+/// Uses [services::NameService] and [services::TypeService].
 pub fn emit(program: ast::Program) -> Result<Vec<u8>, String> {
     let mut name_service = services::NameService::default();
     let mut type_service = services::TypeService::default();

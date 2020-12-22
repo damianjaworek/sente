@@ -1,3 +1,4 @@
+//! Module defining types described in WebAssembly's specification.
 use super::{indices, Encode};
 
 #[derive(Clone, Debug)]

@@ -1,3 +1,4 @@
+//! Module defining type representing a WebAssembly module.
 use super::sections;
 
 #[derive(Debug)]

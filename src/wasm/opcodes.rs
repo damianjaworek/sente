@@ -1,3 +1,4 @@
+//! Module defining opcodes of instructions described in WebAssembly's specification.
 use super::Encode;
 
 #[derive(Debug)]

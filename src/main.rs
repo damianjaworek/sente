@@ -1,3 +1,5 @@
+//! Compiler for Sente language to WebAssembly.
+
 use std::path::PathBuf;
 use structopt::StructOpt;
 
@@ -10,6 +12,8 @@ struct CliOptions {
     output: PathBuf,
 }
 
+/// Main function that runs whenever the compiler is launched.
+/// Validates received command line arguments, opens files and calls [sente::compile]
 fn main() -> std::io::Result<()> {
     let cli_options = CliOptions::from_args();
 

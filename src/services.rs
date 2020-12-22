@@ -1,8 +1,10 @@
+//! Module defining [NameService] and [TypeService] used to keep track of defined names and types.
 use super::wasm::{
     self,
     indices::{FunctionId, LocalId, TypeId},
 };
 
+/// Type used to define names used by programs and assign them corresponding ids.
 #[derive(Clone)]
 pub struct NameService {
     named_entities: Vec<NamedEntity>,
@@ -124,6 +126,7 @@ impl NameService {
     }
 }
 
+/// Type used to define types used by programs and assign them corresponding ids.
 #[derive(Clone)]
 pub struct TypeService {
     defined_types: Vec<Type>,
